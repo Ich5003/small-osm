@@ -37,7 +37,7 @@ type Way struct {
 }
 
 // WayNodes represents a collection of way nodes.
-type WayNodes []*WayNode
+type WayNodes []WayNode
 
 // WayNode is a short node used as part of ways and relations in the osm xml.
 type WayNode struct {
