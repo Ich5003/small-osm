@@ -304,6 +304,7 @@ func (dec *dataDecoder) scanDenseNodes(data []byte) error {
 func (dec *dataDecoder) extractDenseNodes() error {
 	st := dec.primitiveBlock.GetStringtable().GetS()
 	granularity := int64(dec.primitiveBlock.GetGranularity())
+	dateGranularity := int64(dec.primitiveBlock.GetDateGranularity())
 
 	latOffset := dec.primitiveBlock.GetLatOffset()
 	lonOffset := dec.primitiveBlock.GetLonOffset()
@@ -312,7 +313,8 @@ func (dec *dataDecoder) extractDenseNodes() error {
 
 	nodes := make([]osm.Node, dec.versions.Count(protoscan.WireTypeVarint))
 
-	var id, lat, lon int64
+	var id, lat, lon, timestamp, changeset int64
+	var uid, usid int32
 	var index int
 	for dec.versions.HasNext() {
 		n := &nodes[index]
@@ -325,6 +327,50 @@ func (dec *dataDecoder) extractDenseNodes() error {
 		}
 		id += v1
 		n.ID = osm.NodeID(id)
+
+		// Version
+		v2, err := dec.versions.Int32()
+		if err != nil {
+			return err
+		}
+		n.Version = int(v2)
+
+		// Timestamp
+		v3, err := dec.timestamps.Sint64()
+		if err != nil {
+			return err
+		}
+		timestamp += v3
+		_ = time.Duration(timestamp*dateGranularity) * time.Millisecond
+
+		// Changeset
+		v4, err := dec.changesets.Sint64()
+		if err != nil {
+			return err
+		}
+		changeset += v4
+
+		// uid
+		v5, err := dec.uids.Sint32()
+		if err != nil {
+			return err
+		}
+		uid += v5
+
+		// usid
+		v6, err := dec.usids.Sint32()
+		if err != nil {
+			return err
+		}
+		usid += v6
+
+		// Visible
+		if dec.visibles != nil {
+			_, err := dec.visibles.Bool()
+			if err != nil {
+				return err
+			}
+		}
 
 		// lat
 		v8, err := dec.lats.Sint64()
