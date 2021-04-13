@@ -27,6 +27,8 @@ type Scanner struct {
 	SkipWays      bool
 	SkipRelations bool
 
+	OnlyCoastlines bool
+
 	ctx    context.Context
 	closed bool
 

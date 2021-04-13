@@ -542,7 +542,10 @@ func (dec *dataDecoder) scanWays(data []byte) error {
 		}
 	}
 
-	dec.q = append(dec.q, way)
+	if !dec.scanner.OnlyCoastlines || way.Tags.Find("natural") == "coastline" {
+		dec.q = append(dec.q, way)
+	}
+
 	return nil
 }
 
