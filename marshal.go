@@ -333,7 +333,7 @@ func decodeWayNodeIDs(diff []int64) WayNodes {
 	decodeInt64(diff)
 
 	for i, d := range diff {
-		result[i] = WayNode{ID: NodeID(d)}
+		result[i] = &WayNode{ID: NodeID(d)}
 	}
 
 	return result
