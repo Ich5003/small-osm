@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/paulmach/osm"
+	"github.com/ich5003/small-osm"
 
 	"golang.org/x/time/rate"
 )

@@ -3,10 +3,10 @@ package osmgeojson
 import (
 	"fmt"
 
+	"github.com/ich5003/small-osm"
+	"github.com/ich5003/small-osm/internal/mputil"
 	"github.com/paulmach/orb"
 	"github.com/paulmach/orb/geojson"
-	"github.com/paulmach/osm"
-	"github.com/paulmach/osm/internal/mputil"
 )
 
 type context struct {
@@ -317,45 +317,14 @@ func (ctx *context) addMetaProperties(props geojson.Properties, e osm.Element) {
 	meta := make(map[string]interface{}, 5)
 	switch e := e.(type) {
 	case *osm.Node:
-		if !e.Timestamp.IsZero() {
-			meta["timestamp"] = e.Timestamp
-		}
-
 		if e.Version != 0 {
 			meta["version"] = e.Version
-		}
-
-		if e.ChangesetID != 0 {
-			meta["changeset"] = e.ChangesetID
-		}
-
-		if e.User != "" {
-			meta["user"] = e.User
-		}
-
-		if e.UserID != 0 {
-			meta["uid"] = e.UserID
 		}
 
 	case *osm.Way:
-		if !e.Timestamp.IsZero() {
-			meta["timestamp"] = e.Timestamp
-		}
 
 		if e.Version != 0 {
 			meta["version"] = e.Version
-		}
-
-		if e.ChangesetID != 0 {
-			meta["changeset"] = e.ChangesetID
-		}
-
-		if e.User != "" {
-			meta["user"] = e.User
-		}
-
-		if e.UserID != 0 {
-			meta["uid"] = e.UserID
 		}
 
 	case *osm.Relation:

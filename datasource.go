@@ -35,9 +35,6 @@ func (ds *HistoryDatasource) add(o *OSM, visible ...bool) {
 		}
 
 		for _, n := range o.Nodes {
-			if len(visible) == 1 {
-				n.Visible = visible[0]
-			}
 			ds.Nodes[n.ID] = append(ds.Nodes[n.ID], n)
 		}
 	}
@@ -48,9 +45,6 @@ func (ds *HistoryDatasource) add(o *OSM, visible ...bool) {
 		}
 
 		for _, w := range o.Ways {
-			if len(visible) == 1 {
-				w.Visible = visible[0]
-			}
 			ds.Ways[w.ID] = append(ds.Ways[w.ID], w)
 		}
 	}

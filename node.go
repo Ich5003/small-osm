@@ -1,11 +1,9 @@
 package osm
 
 import (
-	"sort"
-	"time"
-
+	"github.com/ich5003/small-osm/internal/osmpb"
 	"github.com/paulmach/orb"
-	"github.com/paulmach/osm/internal/osmpb"
+	"sort"
 
 	"github.com/gogo/protobuf/proto"
 )
@@ -31,21 +29,11 @@ func (id NodeID) ElementID(v int) ElementID {
 
 // Node is an osm point and allows for marshalling to/from osm xml.
 type Node struct {
-	XMLName     xmlNameJSONTypeNode `xml:"node" json:"type"`
-	ID          NodeID              `xml:"id,attr" json:"id"`
-	Lat         float64             `xml:"lat,attr" json:"lat"`
-	Lon         float64             `xml:"lon,attr" json:"lon"`
-	User        string              `xml:"user,attr" json:"user,omitempty"`
-	UserID      UserID              `xml:"uid,attr" json:"uid,omitempty"`
-	Visible     bool                `xml:"visible,attr" json:"visible"`
-	Version     int                 `xml:"version,attr" json:"version,omitempty"`
-	ChangesetID ChangesetID         `xml:"changeset,attr" json:"changeset,omitempty"`
-	Timestamp   time.Time           `xml:"timestamp,attr" json:"timestamp"`
-	Tags        Tags                `xml:"tag" json:"tags,omitempty"`
-
-	// Committed, is the estimated time this object was committed
-	// and made visible in the central OSM database.
-	Committed *time.Time `xml:"committed,attr,omitempty" json:"committed,omitempty"`
+	ID      NodeID  `xml:"id,attr" json:"id"`
+	Lat     float64 `xml:"lat,attr" json:"lat"`
+	Lon     float64 `xml:"lon,attr" json:"lon"`
+	Version int     `xml:"version,attr" json:"version,omitempty"`
+	Tags    Tags    `xml:"tag" json:"tags,omitempty"`
 }
 
 // ObjectID returns the object id of the node.
@@ -61,16 +49,6 @@ func (n *Node) FeatureID() FeatureID {
 // ElementID returns the element id of the node.
 func (n *Node) ElementID() ElementID {
 	return n.ID.ElementID(n.Version)
-}
-
-// CommittedAt returns the best estimate on when this element
-// became was written/committed into the database.
-func (n *Node) CommittedAt() time.Time {
-	if n.Committed != nil {
-		return *n.Committed
-	}
-
-	return n.Timestamp
 }
 
 // TagMap returns the element tags as a key/value map.

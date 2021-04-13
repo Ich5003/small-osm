@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/paulmach/osm"
+	"github.com/ich5003/small-osm"
 )
 
 func TestChildFirstOrdering(t *testing.T) {

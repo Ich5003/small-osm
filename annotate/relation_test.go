@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ich5003/small-osm"
 	"github.com/paulmach/orb"
-	"github.com/paulmach/osm"
 )
 
 func TestRelation(t *testing.T) {

@@ -6,7 +6,6 @@ import (
 	"encoding/xml"
 	"reflect"
 	"testing"
-	"time"
 )
 
 func TestNode(t *testing.T) {
@@ -22,28 +21,8 @@ func TestNode(t *testing.T) {
 		t.Errorf("incorrect id, got %v", v)
 	}
 
-	if v := n.ChangesetID; v != 456 {
-		t.Errorf("incorrect changeset, got %v", v)
-	}
-
-	if v := n.Timestamp; v != time.Date(2014, 4, 10, 0, 43, 05, 0, time.UTC) {
-		t.Errorf("incorrect timestamp, got %v", v)
-	}
-
 	if v := n.Version; v != 1 {
 		t.Errorf("incorrect version, got %v", v)
-	}
-
-	if v := n.Visible; !v {
-		t.Errorf("incorrect visible, got %v", v)
-	}
-
-	if v := n.User; v != "user" {
-		t.Errorf("incorrect user, got %v", v)
-	}
-
-	if v := n.UserID; v != 1357 {
-		t.Errorf("incorrect user id, got %v", v)
 	}
 
 	if v := n.Lat; v != 50.7107023 {

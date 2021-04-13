@@ -1,4 +1,4 @@
-osm [![CI](https://github.com/paulmach/osm/workflows/CI/badge.svg)](https://github.com/paulmach/osm/actions?query=workflow%3ACI+event%3Apush) [![Go Report Card](https://goreportcard.com/badge/github.com/paulmach/osm)](https://goreportcard.com/report/github.com/paulmach/osm) [![Go Reference](https://pkg.go.dev/badge/github.com/paulmach/osm.svg)](https://pkg.go.dev/github.com/paulmach/osm)
+osm [![CI](https://github.com/ich5003/small-osm/workflows/CI/badge.svg)](https://github.com/ich5003/small-osm/actions?query=workflow%3ACI+event%3Apush) [![Go Report Card](https://goreportcard.com/badge/github.com/ich5003/small-osm)](https://goreportcard.com/report/github.com/ich5003/small-osm) [![Go Reference](https://pkg.go.dev/badge/github.com/ich5003/small-osm.svg)](https://pkg.go.dev/github.com/ich5003/small-osm)
 =====
 
 This package is a general purpose library for reading, writing and working

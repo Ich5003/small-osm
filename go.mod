@@ -1,4 +1,4 @@
-module github.com/paulmach/osm
+module github.com/ich5003/small-osm
 
 go 1.13
 

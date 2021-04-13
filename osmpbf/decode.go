@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/proto"
-	"github.com/paulmach/osm"
-	"github.com/paulmach/osm/osmpbf/internal/osmpbf"
+	"github.com/ich5003/small-osm"
+	"github.com/ich5003/small-osm/osmpbf/internal/osmpbf"
 )
 
 const (

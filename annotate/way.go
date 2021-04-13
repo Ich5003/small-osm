@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/paulmach/osm"
-	"github.com/paulmach/osm/annotate/internal/core"
-	"github.com/paulmach/osm/annotate/shared"
+	"github.com/ich5003/small-osm"
+	"github.com/ich5003/small-osm/annotate/internal/core"
+	"github.com/ich5003/small-osm/annotate/shared"
 )
 
 // NodeHistoryDatasourcer is an more strict interface for when we only need node history.

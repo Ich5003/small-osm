@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/paulmach/osm"
-	"github.com/paulmach/osm/osmpbf"
+	"github.com/ich5003/small-osm"
+	"github.com/ich5003/small-osm/osmpbf"
 )
 
 // ExampleStats demonstrates how to read a full file and gather some stats.

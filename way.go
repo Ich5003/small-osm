@@ -30,28 +30,10 @@ func (id WayID) ElementID(v int) ElementID {
 
 // Way is an osm way, ie collection of nodes.
 type Way struct {
-	XMLName     xmlNameJSONTypeWay `xml:"way" json:"type"`
-	ID          WayID              `xml:"id,attr" json:"id"`
-	User        string             `xml:"user,attr" json:"user,omitempty"`
-	UserID      UserID             `xml:"uid,attr" json:"uid,omitempty"`
-	Visible     bool               `xml:"visible,attr" json:"visible"`
-	Version     int                `xml:"version,attr" json:"version,omitempty"`
-	ChangesetID ChangesetID        `xml:"changeset,attr" json:"changeset,omitempty"`
-	Timestamp   time.Time          `xml:"timestamp,attr" json:"timestamp"`
-	Nodes       WayNodes           `xml:"nd" json:"nodes"`
-	Tags        Tags               `xml:"tag" json:"tags,omitempty"`
-
-	// Committed, is the estimated time this object was committed
-	// and made visible in the central OSM database.
-	Committed *time.Time `xml:"committed,attr,omitempty" json:"committed,omitempty"`
-
-	// Updates are changes to the nodes of this way independent
-	// of an update to the way itself. The OSM api allows a child
-	// to be updated without any changes to the parent.
-	Updates Updates `xml:"update,omitempty" json:"updates,omitempty"`
-
-	// Bounds are included by overpass, and maybe others
-	Bounds *Bounds `xml:"bounds,omitempty" json:"bounds,omitempty"`
+	ID      WayID    `xml:"id,attr" json:"id"`
+	Version int      `xml:"version,attr" json:"version,omitempty"`
+	Nodes   WayNodes `xml:"nd" json:"nodes"`
+	Tags    Tags     `xml:"tag" json:"tags,omitempty"`
 }
 
 // WayNodes represents a collection of way nodes.
@@ -62,10 +44,9 @@ type WayNode struct {
 	ID NodeID `xml:"ref,attr,omitempty"`
 
 	// These attributes are populated for concrete versions of ways.
-	Version     int         `xml:"version,attr,omitempty"`
-	ChangesetID ChangesetID `xml:"changeset,attr,omitempty"`
-	Lat         float64     `xml:"lat,attr,omitempty"`
-	Lon         float64     `xml:"lon,attr,omitempty"`
+	Version int     `xml:"version,attr,omitempty"`
+	Lat     float64 `xml:"lat,attr,omitempty"`
+	Lon     float64 `xml:"lon,attr,omitempty"`
 }
 
 // ObjectID returns the object id of the way.
@@ -99,38 +80,9 @@ func (wn WayNode) Point() orb.Point {
 	return orb.Point{wn.Lon, wn.Lat}
 }
 
-// CommittedAt returns the best estimate on when this element
-// became was written/committed into the database.
-func (w *Way) CommittedAt() time.Time {
-	if w.Committed != nil {
-		return *w.Committed
-	}
-
-	return w.Timestamp
-}
-
 // TagMap returns the element tags as a key/value map.
 func (w *Way) TagMap() map[string]string {
 	return w.Tags.Map()
-}
-
-// ApplyUpdatesUpTo will apply the updates to this object upto and including
-// the given time.
-func (w *Way) ApplyUpdatesUpTo(t time.Time) error {
-	var notApplied []Update
-	for _, u := range w.Updates {
-		if u.Timestamp.After(t) {
-			notApplied = append(notApplied, u)
-			continue
-		}
-
-		if err := w.applyUpdate(u); err != nil {
-			return err
-		}
-	}
-
-	w.Updates = notApplied
-	return nil
 }
 
 // applyUpdate will modify the current way and dictated by the given update.
@@ -141,7 +93,6 @@ func (w *Way) applyUpdate(u Update) error {
 	}
 
 	w.Nodes[u.Index].Version = u.Version
-	w.Nodes[u.Index].ChangesetID = u.ChangesetID
 	w.Nodes[u.Index].Lat = u.Lat
 	w.Nodes[u.Index].Lon = u.Lon
 
@@ -169,19 +120,6 @@ func (w *Way) LineStringAt(t time.Time) orb.LineString {
 	ls := make(orb.LineString, 0, len(w.Nodes))
 	for _, n := range w.Nodes {
 		ls = append(ls, n.Point())
-	}
-
-	for _, u := range w.Updates {
-		if u.Timestamp.After(t) {
-			break
-		}
-
-		if u.Index >= len(ls) {
-			continue
-		}
-
-		ls[u.Index][0] = u.Lon
-		ls[u.Index][1] = u.Lat
 	}
 
 	// remove all the zeros

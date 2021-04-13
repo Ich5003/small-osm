@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/paulmach/osm"
-	"github.com/paulmach/osm/annotate/internal/core"
+	"github.com/ich5003/small-osm"
+	"github.com/ich5003/small-osm/annotate/internal/core"
 )
 
 // NoHistoryError is returned if there is no entry in the history

@@ -3,8 +3,8 @@ package osm
 import (
 	"time"
 
+	"github.com/ich5003/small-osm/internal/osmpb"
 	"github.com/paulmach/orb"
-	"github.com/paulmach/osm/internal/osmpb"
 
 	"github.com/gogo/protobuf/proto"
 )
@@ -31,24 +31,13 @@ func unmarshalNode(encoded *osmpb.Node, ss []string, cs *Changeset) (*Node, erro
 
 	info := encoded.GetInfo()
 	n := &Node{
-		ID:          NodeID(encoded.GetId()),
-		User:        ss[info.GetUserSid()],
-		UserID:      UserID(info.GetUserId()),
-		Visible:     info.GetVisible(),
-		Version:     int(info.GetVersion()),
-		ChangesetID: ChangesetID(info.GetChangesetId()),
-		Timestamp:   unixToTime(info.GetTimestamp()),
-		Tags:        tags,
-		Lat:         float64(encoded.GetLat()) / locMultiple,
-		Lon:         float64(encoded.GetLon()) / locMultiple,
+		ID: NodeID(encoded.GetId()),
 
-		Committed: unixToTimePointer(info.GetCommitted()),
-	}
+		Version: int(info.GetVersion()),
 
-	if cs != nil {
-		n.ChangesetID = cs.ID
-		n.UserID = cs.UserID
-		n.User = cs.User
+		Tags: tags,
+		Lat:  float64(encoded.GetLat()) / locMultiple,
+		Lon:  float64(encoded.GetLon()) / locMultiple,
 	}
 
 	return n, nil
@@ -96,34 +85,13 @@ func unmarshalNodes(encoded *osmpb.DenseNodes, ss []string, cs *Changeset) (Node
 	nodes := make(Nodes, len(encoded.Ids))
 	for i := range encoded.Ids {
 		n := &Node{
-			ID:        NodeID(encoded.Ids[i]),
-			Lat:       float64(encoded.Lats[i]) / locMultiple,
-			Lon:       float64(encoded.Lons[i]) / locMultiple,
-			Visible:   encoded.DenseInfo.Visibles[i],
-			Version:   int(encoded.DenseInfo.Versions[i]),
-			Timestamp: unixToTime(encoded.DenseInfo.Timestamps[i]),
+			ID:      NodeID(encoded.Ids[i]),
+			Lat:     float64(encoded.Lats[i]) / locMultiple,
+			Lon:     float64(encoded.Lons[i]) / locMultiple,
+			Version: int(encoded.DenseInfo.Versions[i]),
 		}
 
 		if i < len(encoded.DenseInfo.Committeds) {
-			n.Committed = unixToTimePointer(encoded.DenseInfo.Committeds[i])
-		}
-
-		if cs != nil {
-			n.ChangesetID = cs.ID
-			n.UserID = cs.UserID
-			n.User = cs.User
-		} else {
-			if len(encoded.DenseInfo.ChangesetIds) > 0 {
-				n.ChangesetID = ChangesetID(encoded.DenseInfo.ChangesetIds[i])
-			}
-
-			if len(encoded.DenseInfo.UserIds) > 0 {
-				n.UserID = UserID(encoded.DenseInfo.UserIds[i])
-			}
-
-			if len(encoded.DenseInfo.UserSids) > 0 {
-				n.User = ss[encoded.DenseInfo.UserSids[i]]
-			}
 		}
 
 		if encoded.KeysVals != nil {
@@ -155,15 +123,8 @@ func marshalWay(way *Way, ss *stringSet, includeChangeset bool) *osmpb.Way {
 		Keys: keys,
 		Vals: vals,
 		Info: &osmpb.Info{
-			Version:   int32(way.Version),
-			Timestamp: timeToUnix(way.Timestamp),
-			Visible:   proto.Bool(way.Visible),
+			Version: int32(way.Version),
 		},
-		Updates: marshalUpdates(way.Updates),
-	}
-
-	if way.Committed != nil {
-		encoded.Info.Committed = timeToUnixPointer(*way.Committed)
 	}
 
 	if len(way.Nodes) > 0 {
@@ -172,12 +133,6 @@ func marshalWay(way *Way, ss *stringSet, includeChangeset bool) *osmpb.Way {
 		if way.Nodes[0].Version != 0 {
 			encoded.DenseMembers = encodeDenseWayNodes(way.Nodes)
 		}
-	}
-
-	if includeChangeset {
-		encoded.Info.ChangesetId = int64(way.ChangesetID)
-		encoded.Info.UserId = int32(way.UserID)
-		encoded.Info.UserSid = ss.Add(way.User)
 	}
 
 	return encoded
@@ -191,27 +146,15 @@ func unmarshalWay(encoded *osmpb.Way, ss []string, cs *Changeset) (*Way, error) 
 
 	info := encoded.GetInfo()
 	w := &Way{
-		ID:          WayID(encoded.GetId()),
-		User:        ss[info.GetUserSid()],
-		UserID:      UserID(info.GetUserId()),
-		Visible:     info.GetVisible(),
-		Version:     int(info.GetVersion()),
-		ChangesetID: ChangesetID(info.GetChangesetId()),
-		Timestamp:   unixToTime(info.GetTimestamp()),
-		Committed:   unixToTimePointer(info.GetCommitted()),
-		Tags:        tags,
+		ID: WayID(encoded.GetId()),
+
+		Version: int(info.GetVersion()),
+
+		Tags: tags,
 	}
 
 	w.Nodes = decodeWayNodeIDs(encoded.GetRefs())
 	decodeDenseWayNodes(w.Nodes, encoded.GetDenseMembers())
-
-	w.Updates = unmarshalUpdates(encoded.GetUpdates())
-
-	if cs != nil {
-		w.ChangesetID = cs.ID
-		w.UserID = cs.UserID
-		w.User = cs.User
-	}
 
 	return w, nil
 }
@@ -328,15 +271,8 @@ func denseNodesValues(ns Nodes) denseNodesResult {
 		ds.IDs[i] = int64(n.ID)
 		ds.Lats[i] = geoToInt64(n.Lat)
 		ds.Lons[i] = geoToInt64(n.Lon)
-		ds.Timestamps[i] = n.Timestamp.Unix()
 		ds.Versions[i] = int32(n.Version)
-		ds.Visibles[i] = n.Visible
 		ds.TagCount += len(n.Tags)
-
-		if n.Committed != nil {
-			ds.Committeds[i] = timeToUnix(*n.Committed)
-			cc++
-		}
 	}
 
 	if cc == 0 {
@@ -371,12 +307,6 @@ func nodesChangesetInfo(ns Nodes, ss *stringSet) changesetInfoResult {
 		Changesets: make([]int64, l),
 		UserIDs:    make([]int32, l),
 		UserSids:   make([]int32, l),
-	}
-
-	for i, n := range ns {
-		cs.Changesets[i] = int64(n.ChangesetID)
-		cs.UserIDs[i] = int32(n.UserID)
-		cs.UserSids[i] = int32(ss.Add(n.User))
 	}
 
 	return cs
@@ -421,7 +351,6 @@ func encodeDenseWayNodes(waynodes WayNodes) *osmpb.DenseMembers {
 		lats[i] = geoToInt64(n.Lat)
 		lons[i] = geoToInt64(n.Lon)
 		versions[i] = int32(n.Version)
-		changesetIDs[i] = int64(n.ChangesetID)
 	}
 
 	return &osmpb.DenseMembers{
@@ -443,7 +372,6 @@ func decodeDenseWayNodes(waynodes WayNodes, encoded *osmpb.DenseMembers) {
 
 	for i := range encoded.Versions {
 		waynodes[i].Version = int(encoded.Versions[i])
-		waynodes[i].ChangesetID = ChangesetID(encoded.ChangesetIds[i])
 		waynodes[i].Lat = float64(encoded.Lats[i]) / locMultiple
 		waynodes[i].Lon = float64(encoded.Lons[i]) / locMultiple
 	}

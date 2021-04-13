@@ -10,8 +10,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/paulmach/osm"
-	"github.com/paulmach/osm/osmxml"
+	"github.com/ich5003/small-osm"
+	"github.com/ich5003/small-osm/osmxml"
 )
 
 // ChangesetSeqNum indicates the sequence of the changeset replication found here:
@@ -162,5 +162,5 @@ func (ds *Datasource) changesetURL(n ChangesetSeqNum) string {
 		ds.baseURL(),
 		n/1000000,
 		(n%1000000)/1000,
-		n % 1000)
+		n%1000)
 }

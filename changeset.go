@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 	"time"
 
-	"github.com/paulmach/osm/internal/osmpb"
+	"github.com/ich5003/small-osm/internal/osmpb"
 
 	"github.com/gogo/protobuf/proto"
 )

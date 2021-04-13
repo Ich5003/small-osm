@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/paulmach/osm"
+	"github.com/ich5003/small-osm"
 )
 
 var _ SeqNum = MinuteSeqNum(0)
@@ -343,5 +343,5 @@ func (ds *Datasource) baseSeqURL(sn SeqNum) string {
 		sn.Dir(),
 		n/1000000,
 		(n%1000000)/1000,
-		n % 1000)
+		n%1000)
 }
